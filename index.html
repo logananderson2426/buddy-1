@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🤖 Buddy - Smart Friend</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #283048, #859398);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+    h1 {
+      margin-top: 30px;
+      font-size: 2rem;
+      text-align: center;
+    }
+    .chat-box {
+      background: rgba(255, 255, 255, 0.1);
+      width: 80%;
+      height: 70%;
+      border-radius: 15px;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .message {
+      padding: 10px;
+      border-radius: 10px;
+      margin: 8px 0;
+      max-width: 75%;
+    }
+    .user {
+      align-self: flex-end;
+      background-color: rgba(0, 255, 255, 0.3);
+    }
+    .bot {
+      align-self: flex-start;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    .input-area {
+      display: flex;
+      width: 80%;
+      margin: 20px 0;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #00b894;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🤖 Buddy - Your Smart Friend</h1>
+
+  <div class="chat-box" id="chat-box"></div>
+
+  <div class="input-area">
+    <input id="user-input" placeholder="Type something..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("user-input");
+      const chatBox = document.getElementById("chat-box");
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      // Add user message
+      chatBox.innerHTML += `<div class="message user">${msg}</div>`;
+      input.value = "";
+
+      // Get response from backend
+      const response = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg }),
+      });
+      const data = await response.json();
+
+      chatBox.innerHTML += `<div class="message bot">${data.reply}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Allow Enter key to send message
+    document.getElementById("user-input").addEventListener("keypress", e => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
