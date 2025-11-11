@@ -1,17 +1,17 @@
 import os
 import random
-import google.generativeai as genai
 from flask import Flask, render_template, request, jsonify
+import google.generativeai as genai
 
-# Initialize Flask
 app = Flask(__name__)
 
-# Configure Gemini API
-genai.configure(api_key=os.getenv("AIzaSyAYWnim-vaBROpXNf0Rx2nIsHKvrUjZK60"))
+# Configure Gemini API securely from environment variable
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-pro")
 
+
 # -------------------------------
-# Buddy Logic (from your original code)
+# Helper Functions
 # -------------------------------
 
 def life_path_number(dob):
@@ -51,7 +51,6 @@ def home():
 @app.route("/chat", methods=["POST"])
 def chat():
     user_input = request.json.get("message", "")
-
     category = detect_problem_category(user_input)
 
     prompt = f"""
@@ -66,11 +65,11 @@ If relevant, suggest a motivational movie, song, or food.
     try:
         response = model.generate_content(prompt)
         bot_reply = response.text.strip()
-    except Exception as e:
+    except Exception:
         bot_reply = "Oops 😅 I'm having trouble connecting to my thoughts right now. Try again later!"
 
     return jsonify({"reply": bot_reply})
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
